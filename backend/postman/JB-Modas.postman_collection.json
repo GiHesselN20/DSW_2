@@ -1,0 +1,481 @@
+{
+  "info": {
+    "name": "JB Modas API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "email",
+      "value": "dona@jbmodas.com"
+    },
+    {
+      "key": "senha",
+      "value": "PREENCHA_COM_A_SENHA_CONFIGURADA"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "clienteId",
+      "value": ""
+    },
+    {
+      "key": "produtoId",
+      "value": ""
+    },
+    {
+      "key": "pedidoId",
+      "value": ""
+    },
+    {
+      "key": "vendaId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"senha\": \"{{senha}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Requisição bem-sucedida\", () => pm.expect(pm.response.code).to.be.within(200,299));",
+              "if (pm.response.code < 300) { const data=pm.response.json(); pm.collectionVariables.set(\"token\", data.token); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Meu usuário",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/auth/me",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "03 - Criar cliente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/clientes",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Maria Silva\",\n  \"telefone\": \"89999999999\",\n  \"endereco\": \"Picos - PI\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Requisição bem-sucedida\", () => pm.expect(pm.response.code).to.be.within(200,299));",
+              "if (pm.response.code < 300) { const data=pm.response.json(); pm.collectionVariables.set(\"clienteId\", data.id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Criar produto",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/produtos",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Conjunto fitness verde\",\n  \"categoria\": \"FITNESS\",\n  \"tamanho\": \"M\",\n  \"cor\": \"Verde\",\n  \"preco\": 129.9,\n  \"quantidadeEstoque\": 10,\n  \"disponivel\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Requisição bem-sucedida\", () => pm.expect(pm.response.code).to.be.within(200,299));",
+              "if (pm.response.code < 300) { const data=pm.response.json(); pm.collectionVariables.set(\"produtoId\", data.id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Listar produtos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/produtos?pagina=0&tamanho=20",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "06 - Criar pedido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteId\": \"{{clienteId}}\",\n  \"tipoEntrega\": \"RETIRADA\",\n  \"frete\": 0,\n  \"observacoes\": \"Separar tamanho M\",\n  \"itens\": [\n    {\n      \"produtoId\": \"{{produtoId}}\",\n      \"quantidade\": 1\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Requisição bem-sucedida\", () => pm.expect(pm.response.code).to.be.within(200,299));",
+              "if (pm.response.code < 300) { const data=pm.response.json(); pm.collectionVariables.set(\"pedidoId\", data.id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Confirmar pedido como venda",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/pedidos/{{pedidoId}}/confirmar",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"formaPagamento\": \"PIX\",\n  \"canal\": \"WHATSAPP\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Requisição bem-sucedida\", () => pm.expect(pm.response.code).to.be.within(200,299));",
+              "if (pm.response.code < 300) { const data=pm.response.json(); pm.collectionVariables.set(\"vendaId\", data.id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 - Listar vendas",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/vendas",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "09 - Criar venda direta",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/vendas",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clienteId\": \"{{clienteId}}\",\n  \"formaPagamento\": \"DEBITO\",\n  \"canal\": \"LOJA\",\n  \"itens\": [\n    {\n      \"produtoId\": \"{{produtoId}}\",\n      \"quantidade\": 1\n    }\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "10 - Criar despesa",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/financeiro",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"descricao\": \"Aluguel da loja\",\n  \"categoria\": \"DESPESAS_FIXAS\",\n  \"tipo\": \"SAIDA\",\n  \"valor\": 900,\n  \"dataVencimento\": \"2026-10-28\",\n  \"dataPagamento\": \"2026-10-28\",\n  \"status\": \"PAGO\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "11 - Listar financeiro",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/financeiro",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "12 - Dashboard",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/dashboard",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "13 - Relatório de vendas",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/relatorios/vendas?inicio=2026-10-01&fim=2026-10-31",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "14 - Relatório financeiro",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/relatorios/financeiro?inicio=2026-10-01&fim=2026-10-31",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "15 - Estoque baixo",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/relatorios/estoque?limite=5",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "16 - Cancelar venda do pedido",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/vendas/{{vendaId}}/cancelar",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
